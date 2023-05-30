@@ -3,4 +3,8 @@
     <string name="app_name">Sayed Wardak Android Labs</string>
     <string name="hello_message">سلام نړی!</string>
     <string name="button_message">زه یو تڼۍ یم</string>
+    <string name="spin_message">سپین بیرغ</string>
+    <string name="button1">یوه تڼۍ</string>
+    <string name="button2">دوه تڼۍ</string>
+    <string name="button3">دریم تڼۍ</string>
 </resources>
