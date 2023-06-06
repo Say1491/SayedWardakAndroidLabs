@@ -6,6 +6,11 @@ android {
     namespace 'algonquin.cst2335.ward0252'
     compileSdk 33
 
+
+    buildFeatures{
+        viewBinding true
+    }
+
     defaultConfig {
         applicationId "algonquin.cst2335.ward0252"
         minSdk 22
