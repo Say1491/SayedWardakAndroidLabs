@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Sayed Wardak Android Labs</string>
-    <string name="hello_message">Hello world!</string>
-    <string name="button_message">I\'m a button</string>
+    <string name="textView">Type your Password</string>
+    <string name="button_message">Login</string>
+    <string name="failMessage">You Shall Not Pass!</string>
+    <string name="successMessage">Your Password meets the requirements</string>
 </resources>
