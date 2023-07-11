@@ -1,24 +1,38 @@
 package algonquin.cst2335.ward0252;
 
+import static androidx.core.view.accessibility.AccessibilityEventCompat.setAction;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.Room;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import algonquin.cst2335.ward0252.databinding.ActivityChatRoomBinding;
 import algonquin.cst2335.ward0252.databinding.ReceiveMessageBinding;
@@ -36,11 +50,22 @@ public class ChatRoom extends AppCompatActivity {
     private Button btn;
     private Button rbtn;
 
+    ChatMessageDAO myDAO;
+
+    @Entity
     public static class ChatMessage{
+
+        @PrimaryKey(autoGenerate = true)
+        @ColumnInfo(name="ID")
+        long id;
+        @ColumnInfo(name="message")
         String message;
+        @ColumnInfo(name="timeSent")
         String timeSent;
+        @ColumnInfo(name="isSentButton")
         boolean isSentButton;
 
+        public ChatMessage() {} // empty constructor
         ChatMessage(String m, String t, boolean sent){
             message = m;
             timeSent = t;
@@ -68,6 +93,9 @@ public class ChatRoom extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        MessageDatabase db = Room.databaseBuilder(getApplicationContext(),MessageDatabase.class,"MyChatMessageDatabase").build();
+        myDAO = db.getDao();
+
         binding = ActivityChatRoomBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         chatModel = new ViewModelProvider(this).get(ChatRoomViewModel.class);
@@ -81,17 +109,42 @@ public class ChatRoom extends AppCompatActivity {
             chatModel.messages.postValue(messages = new ArrayList<>());
         }
 
+        Executor thread = Executors.newSingleThreadExecutor();
+        thread.execute(()->{
+            List<ChatMessage> fromDatabase = myDAO.getAllMessages();
+
+            messages.addAll(fromDatabase);
+
+            runOnUiThread(()->{
+                recyclerView.setAdapter(myAdapter);
+            });
+        });
+
         btn.setOnClickListener(click ->{
+
             boolean isSentButton = true;
-            messages.add(new ChatMessage(textInput.getText().toString(),getCurrentTimeStamp(),isSentButton));
+            ChatMessage newMessage = new ChatMessage(textInput.getText().toString(),getCurrentTimeStamp(),isSentButton);
+            messages.add(newMessage);
+            Executor thread1 = Executors.newSingleThreadExecutor();
+            thread1.execute(()->{
+                newMessage.id = myDAO.insertMessage(newMessage);
+
+            });
             myAdapter.notifyDataSetChanged();
             textInput.setText("");
             recyclerView.scrollToPosition(messages.size() - 1);
+
         });
 
         rbtn.setOnClickListener(click ->{
             boolean isSentButton = false;
-            messages.add(new ChatMessage(textInput.getText().toString(),getCurrentTimeStamp(),isSentButton));
+            ChatMessage reMessage = new ChatMessage(textInput.getText().toString(),getCurrentTimeStamp(),isSentButton);
+            messages.add(reMessage);
+            Executor thread2 = Executors.newSingleThreadExecutor();
+            thread2.execute(()->{
+                reMessage.id = myDAO.insertMessage(reMessage);
+
+            });
             myAdapter.notifyDataSetChanged();
             textInput.setText("");
             recyclerView.scrollToPosition(messages.size() - 1);
@@ -142,8 +195,45 @@ public class ChatRoom extends AppCompatActivity {
         TextView timeTxt;
         public MyRowHolder (@NonNull View itemView){
             super(itemView);
+            itemView.setOnClickListener(clk ->{
+                AlertDialog.Builder builder = new AlertDialog.Builder(ChatRoom.this);
+                builder.setTitle("Question:");
+                builder.setMessage("Do you want to delete the message" + messageTxt.getText());
+                builder.setNegativeButton("No", (dialog,cl) ->{
+                    Log.d("DELETE", "User said no");
+                });
+
+                builder.setPositiveButton("Yes", (dialog,cl) ->{
+                    Log.d("DELETE", "User said yes");
+                    int whichRowClicked = getAbsoluteAdapterPosition();
+                    ChatMessage cm = messages.get(whichRowClicked);
+                    Executor thread3 = Executors.newSingleThreadExecutor();
+                    thread3.execute(()->{
+                        myDAO.deleteMessage(cm);
+                        messages.remove(whichRowClicked);
+
+                        runOnUiThread(()->{
+                            myAdapter.notifyDataSetChanged();
+                        });
+
+                        Snackbar.make(btn,"You deleted message #" + whichRowClicked, Snackbar.LENGTH_LONG)
+                                .setAction("Undo",(click)->{
+                                    Executor thrd = Executors.newSingleThreadExecutor();
+                                    thrd.execute(()->{myDAO.insertMessage(cm);});
+                                    messages.add(whichRowClicked,cm);
+                                    runOnUiThread(()->{myAdapter.notifyDataSetChanged();});
+                                })
+                                .show();
+                    });
+
+                });
+
+                builder.create().show();
+            });
+
             messageTxt = itemView.findViewById(R.id.theMessage);
             timeTxt = itemView.findViewById(R.id.theTime);
         }
+
     }
 }
