@@ -11,41 +11,41 @@
         android:id="@+id/sendButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="Send"
         app:layout_constraintBottom_toBottomOf="@+id/textMessage"
         app:layout_constraintEnd_toStartOf="@+id/textMessage"
-        app:layout_constraintTop_toTopOf="@id/textMessage"/>
+        app:layout_constraintTop_toTopOf="@id/textMessage" />
+
 
     <Button
         android:id="@+id/receiveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="97dp"
+        android:layout_height="51dp"
         android:layout_marginStart="8dp"
         android:text="receive"
         app:layout_constraintBottom_toBottomOf="@id/textMessage"
         app:layout_constraintStart_toEndOf="@id/textMessage"
-        app:layout_constraintTop_toTopOf="@id/textMessage"/>
+        app:layout_constraintTop_toTopOf="@id/textMessage" />
 
     <EditText
         android:id="@+id/textMessage"
         android:layout_width="204dp"
         android:layout_height="64dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="88dp"
+        android:layout_marginBottom="8dp"
         android:hint="Enter your message"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycleView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/textMessage"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycleView"
+        android:layout_width="393dp"
+        android:layout_height="722dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toTopOf="@id/textMessage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <FrameLayout
         android:id="@+id/fragmentLocation"
@@ -53,11 +53,10 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/recycleView"
         app:layout_constraintTop_toTopOf="parent">
 
     </FrameLayout>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
