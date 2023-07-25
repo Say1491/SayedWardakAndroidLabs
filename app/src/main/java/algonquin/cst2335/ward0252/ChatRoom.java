@@ -59,6 +59,7 @@ public class ChatRoom extends AppCompatActivity {
 
     ChatMessageDAO myDAO;
 
+
     @Entity
     public static class ChatMessage{
 
@@ -212,8 +213,18 @@ public class ChatRoom extends AppCompatActivity {
 
     }
 
-    private void setSupportActionBar(Toolbar myToolbar) {
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        getMenuInflater().inflate(R.menu.my_menu, menu);
+
+        return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -257,15 +268,6 @@ public class ChatRoom extends AppCompatActivity {
         } else if(item.getItemId() == R.id.item_2){
             Toast.makeText(this, "Version 1.0, Created by Sayed Wardak", Toast.LENGTH_SHORT).show();
         }
-
-        return true;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
-        getMenuInflater().inflate(R.menu.my_menu, menu);
 
         return true;
     }
